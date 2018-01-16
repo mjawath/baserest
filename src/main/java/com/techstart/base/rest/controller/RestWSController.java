@@ -25,23 +25,14 @@ import java.util.List;
 //@RequestMapping("/ws/v1")
 public class RestWSController<T extends BaseEntity> {
 
-    protected IService service;//will be setter injected
+    
+    protected IService<T> service;//will be setter injected
     protected Class busClass;
     protected static ObjectMapper om = new ObjectMapper();
 
     public RestWSController() {
         setParameterisedBusinessClass();
 
-    }
-
-    private void setParameterisedBusinessClass() {
-        Type genericSuperclass = getClass().getGenericSuperclass();
-        if(genericSuperclass instanceof ParameterizedType) {
-            Type[] actualTypeArguments =((ParameterizedType) genericSuperclass).getActualTypeArguments();
-            if (actualTypeArguments != null && actualTypeArguments.length > 0) {
-                busClass = ((Class) (actualTypeArguments[0]));
-            }
-        }
     }
 
     public RestWSController(IService service) {
@@ -62,12 +53,12 @@ public class RestWSController<T extends BaseEntity> {
 
             T ob = getEntity(requestBody);// here that object should not contain the ID
 
-            Object ff= service.create(ob);
+            T ff=  service.create(ob);           
             return new ResponseEntity(ff, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<T> update(String requestBody) {
+    public ResponseEntity<T> update(@RequestBody String requestBody) {
 
         T ob = getEntity(requestBody);
         service.update(ob);
@@ -218,6 +209,17 @@ public class RestWSController<T extends BaseEntity> {
 
         }
 //    return defaultValueIfNullOrEmpty;
+    }
+
+    
+    private void setParameterisedBusinessClass() {
+        Type genericSuperclass = getClass().getGenericSuperclass();
+        if(genericSuperclass instanceof ParameterizedType) {
+            Type[] actualTypeArguments =((ParameterizedType) genericSuperclass).getActualTypeArguments();
+            if (actualTypeArguments != null && actualTypeArguments.length > 0) {
+                busClass = ((Class) (actualTypeArguments[0]));
+            }
+        }
     }
 
 }
