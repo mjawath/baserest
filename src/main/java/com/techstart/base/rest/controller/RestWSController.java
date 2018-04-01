@@ -53,17 +53,17 @@ public class RestWSController<T extends BaseEntity> {
 
             T ob = getEntity(requestBody);// here that object should not contain the ID
 
-            T ff=  service.create(ob);           
-            return new ResponseEntity(ff, HttpStatus.CREATED);
+            T resultObject=  service.create(ob);
+            return new ResponseEntity(resultObject, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     public ResponseEntity<T> update(@RequestBody String requestBody) {
 
         T ob = getEntity(requestBody);
-        service.update(ob);
-        System.out.println("successfully updated object " + ob);
-        return new ResponseEntity(ob, HttpStatus.OK);
+        T resultObject=service.update(ob);
+        System.out.println("successfully updated object " + resultObject);
+        return new ResponseEntity(resultObject, HttpStatus.OK);
 
     }
 
@@ -71,10 +71,8 @@ public class RestWSController<T extends BaseEntity> {
     public ResponseEntity<T> patch(@RequestBody String requestBody) {
 
             T ob = getEntity(requestBody);
-            service.patch(ob);
-            System.out.println("successfully updated object " + ob);
-
-        System.out.println("something went wrong in the update method");
+            T resultObject=service.patch(ob);
+            System.out.println("successfully updated object " + resultObject);
         return new ResponseEntity(ob, HttpStatus.OK);
 
     }
