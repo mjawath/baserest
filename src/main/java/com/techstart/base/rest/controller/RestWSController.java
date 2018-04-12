@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 //@RestController
 //@RequestMapping("/ws/v1")
@@ -58,21 +60,47 @@ public class RestWSController<T extends BaseEntity> {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<T> update(@RequestBody String requestBody) {
+    public ResponseEntity<T> update(@RequestBody(required = true) String requestBody,
+            @PathVariable("id") Optional<String> id) {
 
         T ob = getEntity(requestBody);
-        T resultObject=service.update(ob);
-        System.out.println("successfully updated object " + resultObject);
-        return new ResponseEntity(resultObject, HttpStatus.OK);
+        if (ob == null) {
+            throw new RuntimeException("put body cannot be empty");
+        }
 
+        if (id.isPresent() && !Objects.equals(ob.getId(), id.get())) {//conflict
+            throw new RuntimeException("id conflicts with url id and json payload");
+        }
+        if (!id.isPresent() && Objects.isNull(ob.getId())) {
+            T resultObject = service.create(ob);
+            return new ResponseEntity(resultObject, HttpStatus.OK);
+        }
+        if (Objects.isNull(ob.getId()) || id.isPresent()) {
+            ob.setId(id.get());
+        }
+
+        T resultObject = service.update(ob);
+        System.out.println("successfully updated object " + resultObject);
+
+        return new ResponseEntity(resultObject, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    public ResponseEntity<T> patch(@RequestBody String requestBody) {
+    public ResponseEntity<T> patch(@RequestBody String requestBody,
+            @PathVariable("id") String id) {
 
-            T ob = getEntity(requestBody);
-            T resultObject=service.patch(ob);
-            System.out.println("successfully updated object " + resultObject);
+        T ob = getEntity(requestBody);
+        if (ob == null) {
+            throw new RuntimeException("put body cannot be empty");
+        }
+        if (Objects.isNull(id)) {//conflict
+            throw new RuntimeException("id conflicts with url id and json payload");
+        }
+        if (!Objects.isNull(id) && !Objects.equals(ob.getId(), id)) {//conflict
+            throw new RuntimeException("id conflicts with url id and json payload");
+        }
+        T resultObject = service.patch(ob);
+        System.out.println("successfully updated object " + resultObject);
         return new ResponseEntity(ob, HttpStatus.OK);
 
     }
