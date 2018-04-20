@@ -1,5 +1,7 @@
 package com.techstart.base.rest.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.ui.ModelMap;
@@ -13,7 +15,7 @@ public class BaseController {
 
     protected static boolean SHOW_CRUD_LIST = true;
 
-
+    protected  Logger logger;
 
     @Autowired
     MessageSource messageSource;
