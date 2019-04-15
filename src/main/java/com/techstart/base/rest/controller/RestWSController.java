@@ -59,7 +59,7 @@ public class RestWSController<T extends BaseEntity> {
             return new ResponseEntity(resultObject, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value ={"/{id}","/"}, method = RequestMethod.PUT)
     public ResponseEntity<T> update(@RequestBody(required = true) String requestBody,
             @PathVariable("id") Optional<String> id) {
 
@@ -68,10 +68,11 @@ public class RestWSController<T extends BaseEntity> {
             throw new RuntimeException("put body cannot be empty");
         }
 
-        if (id.isPresent() && !Objects.equals(ob.getId(), id.get())) {//conflict
+        if (id.isPresent() && Objects.nonNull(ob.getId()) &&
+                !Objects.equals(ob.getId(), id.get())) {//conflict
             throw new RuntimeException("id conflicts with url id and json payload");
         }
-        if (!id.isPresent() && Objects.isNull(ob.getId())) {
+        if (!id.isPresent()&& Objects.isNull(ob.getId())) {
             T resultObject = service.create(ob);
             return new ResponseEntity(resultObject, HttpStatus.OK);
         }
@@ -91,18 +92,29 @@ public class RestWSController<T extends BaseEntity> {
 
         T ob = getEntity(requestBody);
         if (ob == null) {
-            throw new RuntimeException("put body cannot be empty");
+            throw new RuntimeException("patch body cannot be empty");
         }
         if (Objects.isNull(id)) {//conflict
             throw new RuntimeException("id conflicts with url id and json payload");
         }
-        if (!Objects.isNull(id) && !Objects.equals(ob.getId(), id)) {//conflict
+        if (Objects.nonNull(id) && !Objects.isNull(ob.getId())
+                && !Objects.equals(ob.getId(), id)) {//conflict
             throw new RuntimeException("id conflicts with url id and json payload");
         }
-        T resultObject = service.patch(ob);
-        System.out.println("successfully updated object " + resultObject);
-        return new ResponseEntity(ob, HttpStatus.OK);
+        final T found = service.findById(id);
+        if (found == null) {
+            throw new RuntimeException(" object found ");
+        }
 
+        try {
+            T merged = om.readerForUpdating(found).readValue(requestBody);
+            merged.setId(id);
+            T resultObject = service.patch(merged);
+            System.out.println("successfully updated object " + resultObject);
+            return new ResponseEntity(resultObject, HttpStatus.OK);
+        } catch (Exception e) {
+            throw new RuntimeException("exception");
+        }
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -118,7 +130,7 @@ public class RestWSController<T extends BaseEntity> {
         this.service = service;
     }
 
-    @RequestMapping("")
+    @RequestMapping(method = RequestMethod.GET)
     public List<T> getAll() {
         return service.findAll();
     }
