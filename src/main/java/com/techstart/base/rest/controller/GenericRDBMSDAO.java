@@ -26,9 +26,9 @@ public class GenericRDBMSDAO  {
     }
 
     @Transactional
-    public String create(Object obj){
+    public Object create(Object obj){
         this.em.persist(obj);
-        return null;
+        return obj;
     }
 
 
@@ -59,14 +59,16 @@ public class GenericRDBMSDAO  {
         return resultList;
     }
 
-
-    public void update(Object ob) {
-
+    @Transactional
+    public Object update(Object ob) {
+        return this.em.merge(ob);
     }
 
-    public void partialUpdate(Object ob) {
-
+    @Transactional
+    public Object partialUpdate(Object ob) {
+        return this.em.merge(ob);
     }
+
 
     public Object getObject(String id, Class domain) {
         Object tem = em.find(domain,id);
