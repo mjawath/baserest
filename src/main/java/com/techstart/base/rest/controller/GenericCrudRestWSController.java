@@ -26,16 +26,17 @@ public class GenericCrudRestWSController {
 
     protected Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private GenericRDBMSDAO repo;
 
     @Autowired
+    private GenericService service;
+
     private ObjectMapper om;
     private JsonNode node;
     private DomainModel[] domains;
 
 
     public GenericCrudRestWSController(@Autowired ObjectMapper om) {
+        this.om = om;
 
         try {
             String content =new String(Files.readAllBytes(Paths.get("DomainModel.json")));
@@ -54,7 +55,7 @@ public class GenericCrudRestWSController {
     public ResponseEntity create(@PathVariable() String domain,@RequestBody String requestBody) {
         System.out.println("create post data received " + requestBody);
         Object ob= getObject(domain, requestBody);
-        Object ret = repo.create(ob);
+        Object ret = service.create(ob);
         return new ResponseEntity(ret, HttpStatus.CREATED);
     }
 
@@ -63,7 +64,7 @@ public class GenericCrudRestWSController {
     public ResponseEntity update(@PathVariable String id,@PathVariable String domain,@RequestBody String requestBody) {
         System.out.println("updated  data received " + requestBody);
         Object ob  = getObjectFromString(domain, requestBody);
-        Object updated = repo.update(ob);
+        Object updated = service.update(ob);
         return new ResponseEntity(updated, HttpStatus.OK);
     }
 
@@ -71,11 +72,11 @@ public class GenericCrudRestWSController {
     @PatchMapping(path = {"/{domain}/{id}","/{domain}/{id}/"})
     public ResponseEntity patchObject(@PathVariable String id,@PathVariable String domain,@RequestBody String requestBody) {
         System.out.println("update  data received " + requestBody);
-        Object existing = repo.getObject(id, getDomainClass(domain));
+        Object existing = service.getObject(id, getDomainClass(domain));
         ObjectReader objectReader = om.readerForUpdating(existing);
         try {
             Object toUpdate = objectReader.readValue(requestBody);
-            Object updated = repo.partialUpdate(toUpdate);
+            Object updated = service.partialUpdate(toUpdate);
             return new ResponseEntity(updated, HttpStatus.OK);
         } catch (IOException e) {
             e.printStackTrace();
@@ -95,7 +96,7 @@ public class GenericCrudRestWSController {
 
     @GetMapping(path = {"/{domain}/{id}","/{domain}/{id}/"})
     public ResponseEntity  getObject(@PathVariable("id") String id,@PathVariable String domain) {
-        Object ob = repo.getObject(id,getDomainClass(domain));
+        Object ob = service.getObject(id,getDomainClass(domain));
         return ResponseEntity.ok(ob);
     }
 
@@ -104,7 +105,7 @@ public class GenericCrudRestWSController {
     public ResponseEntity<List>  getAll(@PathVariable() String domain,@RequestParam(required = false)Integer  size,
                                         @RequestParam(required = false) Integer page,@RequestParam(required = false) String sort) {
         logger.info("getAll");
-        List all = repo.getAll(Dummy.class,page,size,sort);
+        List all = service.getAll(Dummy.class,page,size,sort);
         logger.info("getAll " + all.size());
         return ResponseEntity.ok(all);
     }
