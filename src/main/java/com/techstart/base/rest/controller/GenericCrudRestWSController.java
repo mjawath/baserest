@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by jawa on 9/18/2020.
@@ -110,17 +112,29 @@ public class GenericCrudRestWSController {
         return ResponseEntity.ok(all);
     }
 
-    @RequestMapping("/page/{pageNo}")
-    public ResponseEntity<List> getAll(@PathVariable("pageNo") int pageNo, HttpServletRequest request) {
+    @GetMapping(path = {"/{domain}/info","/{domain}/info/"})
+    public ResponseEntity  getInfo(@PathVariable() String domain,@RequestParam(required = false)Integer  size,
+                                        @RequestParam(required = false) Integer page,@RequestParam(required = false) String sort) {
+        logger.info("getInfo");
 
-        return ResponseEntity.ok(new ArrayList());
+        Class domainClass = getDomainClass(domain);
+        Optional<DomainModel> first = Arrays.asList(domains).stream().filter(e -> domainClass != null).findFirst();
+        if(first.isPresent()){
+            try {
+                Object o = domainClass.newInstance();
+                return ResponseEntity.ok(o);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Instance could not be created");
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Instance could not be found");
+        }
     }
-
-
 
     private Class getDomainClass(String domain){
         for(DomainModel dom:domains){
-            if(dom.getClassName().contains("."+domain)){
+            if(dom.getClassName().toLowerCase().contains("."+domain.toLowerCase())){
                 try {
                     return Class.forName(dom.getClassName());
                 } catch (ClassNotFoundException e) {
