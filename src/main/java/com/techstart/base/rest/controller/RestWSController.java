@@ -8,6 +8,7 @@ import com.mycompany.entitybase.service.IService;
 import com.techstart.commons.util.StringUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,22 +20,20 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-//@RestController
-//@RequestMapping("/ws/v1")
 public class RestWSController<T extends BaseEntity> {
 
-    
+
     protected IService<T> service;//will be setter injected
     protected Class busClass;
     protected static ObjectMapper om = new ObjectMapper();
 
     public RestWSController() {
         setParameterisedBusinessClass();
-
     }
 
     public RestWSController(IService service) {
@@ -53,15 +52,15 @@ public class RestWSController<T extends BaseEntity> {
         System.out.println("create post data recieved " + requestBody);
         //from the postquery ..create the  object
 
-            T ob = getEntity(requestBody);// here that object should not contain the ID
+        T ob = getEntity(requestBody);// here that object should not contain the ID
 
-            T resultObject=  service.create(ob);
-            return new ResponseEntity(resultObject, HttpStatus.CREATED);
+        T resultObject = service.create(ob);
+        return new ResponseEntity(resultObject, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value ={"/{id}","/"}, method = RequestMethod.PUT)
+    @RequestMapping(value = {"/{id}", "/"}, method = RequestMethod.PUT)
     public ResponseEntity<T> update(@RequestBody(required = true) String requestBody,
-            @PathVariable("id") Optional<String> id) {
+                                    @PathVariable("id") Optional<String> id) {
 
         T ob = getEntity(requestBody);
         if (ob == null) {
@@ -72,7 +71,7 @@ public class RestWSController<T extends BaseEntity> {
                 !Objects.equals(ob.getId(), id.get())) {//conflict
             throw new RuntimeException("id conflicts with url id and json payload");
         }
-        if (!id.isPresent()&& Objects.isNull(ob.getId())) {
+        if (!id.isPresent() && Objects.isNull(ob.getId())) {
             T resultObject = service.create(ob);
             return new ResponseEntity(resultObject, HttpStatus.OK);
         }
@@ -88,7 +87,7 @@ public class RestWSController<T extends BaseEntity> {
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     public ResponseEntity<T> patch(@RequestBody String requestBody,
-            @PathVariable("id") String id) {
+                                   @PathVariable("id") String id) {
 
         T ob = getEntity(requestBody);
         if (ob == null) {
@@ -125,14 +124,34 @@ public class RestWSController<T extends BaseEntity> {
 
     }
 
-//    @Autowired
+    //    @Autowired
     public void setService(IService service) {
         this.service = service;
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<T> getAll() {
-        return service.findAll();
+    public ResponseEntity<List<T>> getAll(HttpServletRequest request) {
+
+        String column = request.getParameter("field");
+        String value = request.getParameter("field-value");
+        String value2 = request.getParameter("field-value2");
+
+        List<T> list = new ArrayList<>();
+        if (column != null && value != null && value2 != null) {
+            list.addAll(service.search(column, value,value2));
+        }else
+        if (column != null && value != null) {
+            list.addAll(service.search(column, value));
+        } else {
+            list.addAll(service.findAll());
+        }
+        HttpHeaders responseHeaders = new HttpHeaders();
+        if (list == null || list.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        responseHeaders.set("noOfRecords", String.valueOf(list.size()));
+        ResponseEntity responseEntity = ResponseEntity.ok().headers(responseHeaders).body(list);
+        return responseEntity;
     }
 
     @RequestMapping("/page/{pageNo}")
@@ -167,8 +186,8 @@ public class RestWSController<T extends BaseEntity> {
     public Page<T> searchPage(HttpServletRequest request) {
         String column = request.getParameter("column");
         String value = request.getParameter("value");
-        int page = getValue(request.getParameter("page"),0);
-        int size = getValue(request.getParameter("size"),50);
+        int page = getValue(request.getParameter("page"), 0);
+        int size = getValue(request.getParameter("size"), 50);
 
         String operator = request.getParameter("operator");
         //operator = is by default
@@ -184,27 +203,27 @@ public class RestWSController<T extends BaseEntity> {
         return null;
     }
 
-    protected   T getEntity(String payloadJson) {
-      return (T) getValue(payloadJson,busClass);
+    protected T getEntity(String payloadJson) {
+        return (T) getValue(payloadJson, busClass);
     }
 
-    protected static   <T> T getValue(String payloadJson,Class<T> busClass) {
+    protected static <T> T getValue(String payloadJson, Class<T> busClass) {
         T ob = null;
         try {  //read JSON like DOM Parser
             JsonNode rootNode = om.readTree(payloadJson);
             JsonNode entityNode = rootNode.path("entity");
-            if(entityNode!=null && entityNode.isMissingNode()){
+            if (entityNode != null && entityNode.isMissingNode()) {
 
                 ob = om.readValue(rootNode.toString(), busClass);
 
-            }else {
+            } else {
                 ob = om.readValue(entityNode.toString(), busClass);
 
             }
             return ob;
 
         } catch (IOException ie) {
-            throw new DataException("JSON Parsing Error  "+payloadJson,ie);
+            throw new DataException("JSON Parsing Error  " + payloadJson, ie);
         }
 //            catch (Exception e) {
 
@@ -222,14 +241,14 @@ public class RestWSController<T extends BaseEntity> {
 
     }
 
-    public static <T> T getT(String payloadJson,String path,Class busClass){
+    public static <T> T getT(String payloadJson, String path, Class busClass) {
         T ob = null;
         try {  //read JSON like DOM Parser
             JsonNode rootNode = om.readTree(payloadJson);
             JsonNode entityNode = rootNode.path(path);
-            return  (T) om.readValue(entityNode.toString(),busClass);
+            return (T) om.readValue(entityNode.toString(), busClass);
         } catch (IOException ie) {
-            throw new DataException("JSON Parsing Error  "+payloadJson,ie);
+            throw new DataException("JSON Parsing Error  " + payloadJson, ie);
         }
     }
 
@@ -249,11 +268,11 @@ public class RestWSController<T extends BaseEntity> {
 //    return defaultValueIfNullOrEmpty;
     }
 
-    
+
     private void setParameterisedBusinessClass() {
         Type genericSuperclass = getClass().getGenericSuperclass();
-        if(genericSuperclass instanceof ParameterizedType) {
-            Type[] actualTypeArguments =((ParameterizedType) genericSuperclass).getActualTypeArguments();
+        if (genericSuperclass instanceof ParameterizedType) {
+            Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
             if (actualTypeArguments != null && actualTypeArguments.length > 0) {
                 busClass = ((Class) (actualTypeArguments[0]));
             }

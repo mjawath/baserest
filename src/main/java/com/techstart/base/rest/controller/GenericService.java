@@ -23,7 +23,7 @@ public class GenericService {
 
     @Transactional
     public Object create(Object obj){
-        return this.create(obj);
+        return repo.create(obj);
     }
 
 

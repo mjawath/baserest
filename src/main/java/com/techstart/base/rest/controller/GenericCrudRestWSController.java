@@ -56,7 +56,7 @@ public class GenericCrudRestWSController {
     @PostMapping(path = {"/{domain}/","/{domain}"})
     public ResponseEntity create(@PathVariable() String domain,@RequestBody String requestBody) {
         System.out.println("create post data received " + requestBody);
-        Object ob= getObject(domain, requestBody);
+        Object ob= getObjectFromString(domain, requestBody);
         Object ret = service.create(ob);
         return new ResponseEntity(ret, HttpStatus.CREATED);
     }
