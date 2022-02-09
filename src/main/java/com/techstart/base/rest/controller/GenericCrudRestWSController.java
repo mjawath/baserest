@@ -48,7 +48,7 @@ public class GenericCrudRestWSController {
 
         } catch (Exception e) {
             logger.error("GenericCrudRestWSController",e);
-            e.printStackTrace();
+//            e.printStackTrace();
         }
 
     }

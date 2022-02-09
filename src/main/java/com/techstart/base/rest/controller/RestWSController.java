@@ -1,5 +1,6 @@
 package com.techstart.base.rest.controller;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.entitybase.BaseEntity;
@@ -34,6 +35,7 @@ public class RestWSController<T extends BaseEntity> {
 
     public RestWSController() {
         setParameterisedBusinessClass();
+        om.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public RestWSController(IService service) {
