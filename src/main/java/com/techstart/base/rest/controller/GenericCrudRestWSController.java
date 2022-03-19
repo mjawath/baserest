@@ -106,9 +106,9 @@ public class GenericCrudRestWSController {
     @GetMapping(path = {"/{domain}/","/{domain}"})
     public ResponseEntity<List>  getAll(@PathVariable() String domain,@RequestParam(required = false)Integer  size,
                                         @RequestParam(required = false) Integer page,@RequestParam(required = false) String sort) {
-        logger.info("getAll");
-        List all = service.getAll(Dummy.class,page,size,sort);
-        logger.info("getAll " + all.size());
+        logger.info("getAll {} {} {} {}",domain,size,page,sort);
+        List all = service.getAll(getDomainClass(domain),page,size,sort);
+        logger.info("getAll {} items retrieved " , all.size());
         return ResponseEntity.ok(all);
     }
 
@@ -134,9 +134,9 @@ public class GenericCrudRestWSController {
 
     private Class getDomainClass(String domain){
         for(DomainModel dom:domains){
-            if(dom.getClassName().toLowerCase().contains("."+domain.toLowerCase())){
+            if(dom.getClassPath().toLowerCase().contains(domain.toLowerCase())){
                 try {
-                    return Class.forName(dom.getClassName());
+                    return Class.forName(dom.getClassPath());
                 } catch (ClassNotFoundException e) {
                     logger.error("cannot find domain class",e);
                 }

@@ -6,7 +6,8 @@ package com.techstart.base.rest.controller;
 public class DomainModel {
 
     private String className;
-    private String persistenceType;
+    private String persistenceType; //RDBMS, NoSQL, etc.
+    private String classPath;
 
 
     public String getClassName() {
@@ -23,5 +24,13 @@ public class DomainModel {
 
     public void setPersistenceType(String persistenceType) {
         this.persistenceType = persistenceType;
+    }
+
+    public String getClassPath() {
+        return classPath;
+    }
+
+    public void setClassPath(String classPath) {
+        this.classPath = classPath;
     }
 }

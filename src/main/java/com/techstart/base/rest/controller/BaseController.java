@@ -16,7 +16,6 @@ public class BaseController {
     protected static boolean SHOW_CRUD_LIST = true;
 
     protected  Logger logger;
-
     @Autowired
     MessageSource messageSource;
     
