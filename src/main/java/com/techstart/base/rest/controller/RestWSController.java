@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.entitybase.BaseEntity;
 import com.mycompany.entitybase.DataException;
 import com.mycompany.entitybase.service.IService;
+import com.mycompany.entitybase.model.SearchRequest;
+import com.mycompany.entitybase.model.SearchResult;
 import com.techstart.commons.util.StringUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -154,6 +156,11 @@ public class RestWSController<T extends BaseEntity> {
         responseHeaders.set("noOfRecords", String.valueOf(list.size()));
         ResponseEntity responseEntity = ResponseEntity.ok().headers(responseHeaders).body(list);
         return responseEntity;
+    }
+
+    public ResponseEntity<SearchResult<T>> findEnterpriseSystems(SearchRequest filter) {
+        SearchResult<T> search = service.search(filter);
+        return ResponseEntity.ok(search);
     }
 
     @RequestMapping("/page/{pageNo}")
