@@ -9,6 +9,8 @@ import com.mycompany.entitybase.model.SearchRequest;
 import com.mycompany.entitybase.model.SearchResult;
 import com.mycompany.entitybase.service.IService;
 import com.techstart.commons.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +33,7 @@ import java.util.Optional;
 public class RestWSController<T extends BaseEntity> {
 
 
+    private Logger logger = LoggerFactory.getLogger(RestWSController.class);
     protected IService<T> service;//will be setter injected
     protected Class busClass;
     protected static ObjectMapper om = new ObjectMapper();
@@ -47,8 +50,7 @@ public class RestWSController<T extends BaseEntity> {
 
     @RequestMapping("/ping")
     protected String testRest(String txt) {
-        System.out.println("=========================rest is working");
-        return "rest is working";
+        return "rest is working: "+txt;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -134,7 +136,7 @@ public class RestWSController<T extends BaseEntity> {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<T>> getAll(HttpServletRequest request) {
+    public ResponseEntity<SearchResult<T>> getAll(HttpServletRequest request) {
 
         String column = request.getParameter("field");
         String value = request.getParameter("field-value");
@@ -154,7 +156,9 @@ public class RestWSController<T extends BaseEntity> {
         }
         responseHeaders.set("noOfRecords", String.valueOf(list.size()));
         ResponseEntity responseEntity = ResponseEntity.ok().headers(responseHeaders).body(list);
-        return responseEntity;
+//        return responseEntity;
+        SearchResult<T> search = service.search(null);
+        return ResponseEntity.ok(search);
     }
 
     public ResponseEntity<SearchResult<T>> findEnterpriseSystems(SearchRequest filter) {
