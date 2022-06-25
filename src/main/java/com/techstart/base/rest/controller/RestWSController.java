@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.entitybase.BaseEntity;
 import com.mycompany.entitybase.DataException;
-import com.mycompany.entitybase.service.IService;
 import com.mycompany.entitybase.model.SearchRequest;
 import com.mycompany.entitybase.model.SearchResult;
+import com.mycompany.entitybase.service.IService;
 import com.techstart.commons.util.StringUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -142,9 +142,8 @@ public class RestWSController<T extends BaseEntity> {
 
         List<T> list = new ArrayList<>();
         if (column != null && value != null && value2 != null) {
-            list.addAll(service.search(column, value,value2));
-        }else
-        if (column != null && value != null) {
+            list.addAll(service.search(column, value, value2));
+        } else if (column != null && value != null) {
             list.addAll(service.search(column, value));
         } else {
             list.addAll(service.findAll());
