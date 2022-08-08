@@ -50,7 +50,7 @@ public class RestWSController<T extends BaseEntity> {
 
     @RequestMapping("/ping")
     protected String testRest(String txt) {
-        return "rest is working: "+txt;
+        return "rest is working: " + txt;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -136,33 +136,16 @@ public class RestWSController<T extends BaseEntity> {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<SearchResult<T>> getAll(HttpServletRequest request) {
+    public ResponseEntity<SearchResult<T>> getAll(SearchRequest request) {
 
-        String column = request.getParameter("field");
-        String value = request.getParameter("field-value");
-        String value2 = request.getParameter("field-value2");
-
-        List<T> list = new ArrayList<>();
-        if (column != null && value != null && value2 != null) {
-            list.addAll(service.search(column, value, value2));
-        } else if (column != null && value != null) {
-            list.addAll(service.search(column, value));
-        } else {
-            list.addAll(service.findAll());
+        if( request == null){
+            request = new SearchRequest();
         }
-        HttpHeaders responseHeaders = new HttpHeaders();
-        if (list == null || list.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        if( request.getPersistenceClass() == null){
+            request.setPersistenceClass(busClass);
         }
-        responseHeaders.set("noOfRecords", String.valueOf(list.size()));
-        ResponseEntity responseEntity = ResponseEntity.ok().headers(responseHeaders).body(list);
-//        return responseEntity;
-        SearchResult<T> search = service.search(null);
-        return ResponseEntity.ok(search);
-    }
 
-    public ResponseEntity<SearchResult<T>> findEnterpriseSystems(SearchRequest filter) {
-        SearchResult<T> search = service.search(filter);
+        SearchResult<T> search = service.search(request);
         return ResponseEntity.ok(search);
     }
 
@@ -173,7 +156,7 @@ public class RestWSController<T extends BaseEntity> {
 
     @RequestMapping("/{id}")
     public T get(@PathVariable("id") String id) {
-        return (T) service.findById(id);
+        return service.findById(id);
     }
 
     @RequestMapping("/search")
