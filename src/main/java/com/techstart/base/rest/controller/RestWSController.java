@@ -13,19 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -102,7 +97,7 @@ public class RestWSController<T extends BaseEntity> {
         if (Objects.isNull(id)) {//conflict
             throw new RuntimeException("id conflicts with url id and json payload");
         }
-        if (Objects.nonNull(id) && !Objects.isNull(ob.getId())
+        if (!Objects.isNull(ob.getId())
                 && !Objects.equals(ob.getId(), id)) {//conflict
             throw new RuntimeException("id conflicts with url id and json payload");
         }
@@ -123,11 +118,9 @@ public class RestWSController<T extends BaseEntity> {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public ResponseEntity delete(@PathVariable("id") String id) {
-
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("id") String id) {
         service.deleteById(id);
-        return new ResponseEntity(HttpStatus.OK);
-
     }
 
     //    @Autowired
@@ -138,14 +131,15 @@ public class RestWSController<T extends BaseEntity> {
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<SearchResult<T>> getAll(SearchRequest request) {
 
-        if( request == null){
+        if (request == null) {
             request = new SearchRequest();
         }
-        if( request.getPersistenceClass() == null){
+        if (request.getPersistenceClass() == null) {
             request.setPersistenceClass(busClass);
         }
 
         SearchResult<T> search = service.search(request);
+        if (search.getSize() == 0) return ResponseEntity.noContent().build();
         return ResponseEntity.ok(search);
     }
 
