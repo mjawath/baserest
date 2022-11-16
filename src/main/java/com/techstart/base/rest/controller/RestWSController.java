@@ -15,12 +15,14 @@ import com.techstart.base.rest.controller.exceptions.ServerError;
 import com.techstart.commons.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -30,12 +32,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class RestWSController<T extends BaseEntity> {
-
-
     private Logger logger = LoggerFactory.getLogger(RestWSController.class);
     protected IService<T> service;//will be setter injected
     protected Class busClass;
     protected static ObjectMapper om = new ObjectMapper();
+    @Autowired
+    private GenericService genericService;
 
     public RestWSController() {
         setParameterisedBusinessClass();
@@ -53,13 +55,8 @@ public class RestWSController<T extends BaseEntity> {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity create(@RequestBody String requestBody) {
-        System.out.println("create post data recieved " + requestBody);
-        //from the postquery ..create the  object
-
-        T ob = getEntity(requestBody);// here that object should not contain the ID
-
-        T resultObject = service.create(ob);
+    public ResponseEntity<T> create(@RequestBody T domainObject) {
+        T resultObject = service.create(domainObject);
         return new ResponseEntity(resultObject, HttpStatus.CREATED);
     }
 
@@ -216,20 +213,6 @@ public class RestWSController<T extends BaseEntity> {
         } catch (IOException ie) {
             throw new DataException("JSON Parsing Error  " + payloadJson, ie);
         }
-//            catch (Exception e) {
-
-//        //translate the exception to meaningful json payload /pojo representation with
-//        // nessary parameter which can ease debugging / support / user friendly
-//        if (e instanceof DataException) {
-//
-//        } else if (e instanceof ParsingException) {
-//
-//        }
-//        throw new DataException(postQuery, e);// error handler which will hanlde this
-
-//    }
-
-
     }
 
     public static <T> T getT(String payloadJson, String path, Class busClass) {

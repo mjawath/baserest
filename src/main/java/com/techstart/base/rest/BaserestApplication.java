@@ -1,8 +1,5 @@
 package com.techstart.base.rest;
 
-import com.techstart.base.rest.controller.Dummy;
-import com.techstart.base.rest.controller.GenericRDBMSDAO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
