@@ -1,22 +1,17 @@
 package com.techstart.base.rest.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by jawa on 11/18/2020.
  */
-@Repository
+@Component
 public class GenericRDBMSDAO  {
-
 
     private EntityManager em;
 

@@ -15,7 +15,7 @@ import java.io.StringWriter;
 
 /**
  *
- * @author LENOVO PC
+ * @author jawa
  */
 @ControllerAdvice
 public class ExceptionControllerAdvice {
@@ -30,16 +30,16 @@ public class ExceptionControllerAdvice {
     }
 
     @ExceptionHandler(BadRequest.class)
-    public ResponseEntity<ErrorResponse> badRequestExceptionHandler(NoContentFound ex) {
+    public ResponseEntity<ErrorResponse> badRequestExceptionHandler(BadRequest ex) {
         return exceptionHandler(ex, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ContentConflict.class)
-    public ResponseEntity<ErrorResponse> contentConflictExceptionHandler(NoContentFound ex) {
+    public ResponseEntity<ErrorResponse> contentConflictExceptionHandler(ContentConflict ex) {
         return exceptionHandler(ex, HttpStatus.CONFLICT);
     }
     @ExceptionHandler(ServerError.class)
-    public ResponseEntity<ErrorResponse> serverErrorExceptionHandler(NoContentFound ex) {
+    public ResponseEntity<ErrorResponse> serverErrorExceptionHandler(ServerError ex) {
         return exceptionHandler(ex, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     public ResponseEntity<ErrorResponse> exceptionHandler(Exception ex,HttpStatus status) {

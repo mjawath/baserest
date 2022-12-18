@@ -22,21 +22,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class RestWSController<T extends BaseEntity> {
     private Logger logger = LoggerFactory.getLogger(RestWSController.class);
     protected IService<T> service;//will be setter injected
     protected Class busClass;
     protected static ObjectMapper om = new ObjectMapper();
-    @Autowired
+    @Autowired(required = false)
     private GenericService genericService;
 
     public RestWSController() {
@@ -62,26 +60,25 @@ public class RestWSController<T extends BaseEntity> {
 
     @RequestMapping(value = {"/{id}", "/"}, method = RequestMethod.PUT)
     public ResponseEntity<T> update(@RequestBody(required = true) String requestBody,
-                                    @PathVariable("id") Optional<String> id) {
+                                    @PathVariable("id") String id) {
 
         T ob = getEntity(requestBody);
         if (ob == null) {
             throw new BadRequest("patch body cannot be empty");
         }
-        if (Objects.isNull(id)) {//conflict
-            throw new ContentConflict("id conflicts with url id and json payload");
-        }
+//        if (Objects.isNull(id)) {//conflict
+//            throw new ContentConflict("id conflicts with url id and json payload");
+//        }
 
-        if (id.isPresent() && Objects.nonNull(ob.getId()) &&
-                !Objects.equals(ob.getId(), id.get())) {//conflict
+        if (Objects.isNull(id) && Objects.isNull(ob.getId())) {
+            T resultObject = service.create(ob);
+            return new ResponseEntity<>(resultObject, HttpStatus.CREATED);
+        }
+        if (!Objects.equals(ob.getId(), id)) {//conflict
             throw new ContentConflict("id conflicts with url id and json payload");
         }
-        if (!id.isPresent() && Objects.isNull(ob.getId())) {
-            T resultObject = service.create(ob);
-            return new ResponseEntity<>(resultObject, HttpStatus.OK);
-        }
-        if (Objects.isNull(ob.getId()) || id.isPresent()) {
-            ob.setId(id.get());
+        if (Objects.isNull(ob.getId()) ) {
+            ob.setId(id);
         }
 
         T resultObject = service.update(ob);

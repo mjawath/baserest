@@ -10,11 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +45,7 @@ public class GenericCrudRestWSController {
             domains = om.convertValue(doms,DomainModel[].class);
 
         } catch (Exception e) {
-            logger.error("GenericCrudRestWSController",e);
+            logger.error("DomainModel.json is not found for GenericCrudRestWSController",e);
 //            e.printStackTrace();
         }
 
