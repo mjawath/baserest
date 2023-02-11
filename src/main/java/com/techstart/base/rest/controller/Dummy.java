@@ -2,7 +2,7 @@ package com.techstart.base.rest.controller;
 
 import com.mycompany.entitybase.BaseEntityString;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 /**
  * Created by jawa on 11/18/2020.

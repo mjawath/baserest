@@ -13,6 +13,7 @@ import com.techstart.base.rest.controller.exceptions.ContentConflict;
 import com.techstart.base.rest.controller.exceptions.NoContentFound;
 import com.techstart.base.rest.controller.exceptions.ServerError;
 import com.techstart.commons.util.StringUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -184,7 +184,7 @@ public class BaseRestAdminResource<T extends BaseEntity> {
         }
         System.out.println(column + "  --  " + value + "  --  " + operator + "  --  ");
         if (!StringUtil.isNullOrEmpty(column) && !StringUtil.isNullOrEmpty(value)) {
-            Page<T> shops = service.searchPageable(column, value, new PageRequest(page, size));
+            Page<T> shops = service.searchPageable(column, value,  PageRequest.of(page, size));
             return shops;
         }
         return null;

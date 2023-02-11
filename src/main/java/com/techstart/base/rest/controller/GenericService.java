@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Query;
 import java.util.List;
 
 /**
@@ -22,22 +21,21 @@ public class GenericService {
 
 
     @Transactional
-    public Object create(Object obj){
+    public Object create(Object obj) {
         return repo.create(obj);
     }
 
 
-
-    public List getAll(Class domain, Integer size , Integer page, String sort){
-        return repo.getAll(domain,size,page,sort);
+    public List getAll(Class domain, Integer size, Integer page, String sort) {
+        return repo.getAll(domain, size, page, sort);
     }
 
 
-    public List getAll(Class domain,String sort) {
-        return repo.getAll(domain,sort);
+    public List getAll(Class domain, String sort) {
+        return repo.getAll(domain, sort);
     }
 
-    public List getAll(Class domain){
+    public List getAll(Class domain) {
         return repo.getAll(domain);
     }
 
@@ -53,7 +51,7 @@ public class GenericService {
 
 
     public Object getObject(String id, Class domain) {
-        Object tem = repo.getObject(id,domain);
+        Object tem = repo.getObject(id, domain);
         return tem;
     }
 }
