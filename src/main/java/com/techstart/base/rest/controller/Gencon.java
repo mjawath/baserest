@@ -2,6 +2,7 @@ package com.techstart.base.rest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.techstart.commons.util.ReflectionUtil;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.annotation.PostConstruct;
 
 //@Component
 public class Gencon {
