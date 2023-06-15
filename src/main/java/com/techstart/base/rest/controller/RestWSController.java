@@ -123,7 +123,7 @@ public class RestWSController<T extends BaseEntity> {
         this.service = service;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(path = {"","/"},method = RequestMethod.GET)
     public ResponseEntity<SearchResult<T>> getAll(SearchRequest request) {
 
         if (request == null) {

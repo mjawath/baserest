@@ -35,7 +35,8 @@ public interface StorageService {
 @Component
 class StorageServiceImpl implements StorageService{
 
-	private String filePath ="C:\\Users\\jawa\\Pictures\\shoes images - Google Search_files\\";
+	String currentDirectory = System.getProperty("user.dir");
+	private String filePath =currentDirectory+File.separator+"images"+File.separator;
 
 	private Logger log = LoggerFactory.getLogger(StorageServiceImpl.class);
 
