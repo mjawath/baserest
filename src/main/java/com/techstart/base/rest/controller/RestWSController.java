@@ -58,9 +58,9 @@ public class RestWSController<T extends BaseEntity> {
         return new ResponseEntity(resultObject, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = {"/{id}", "/"}, method = RequestMethod.PUT)
+    @RequestMapping(value = {"","/{id}", "/"}, method = RequestMethod.PUT)
     public ResponseEntity<T> update(@RequestBody(required = true) String requestBody,
-                                    @PathVariable("id") String id) {
+                                    @PathVariable(value = "id",required = false) String id) {
 
         T ob = getEntity(requestBody);
         if (ob == null) {
